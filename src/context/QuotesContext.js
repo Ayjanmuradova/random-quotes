@@ -1,19 +1,19 @@
 "use client";
-import { createContext, useState, useContext, useEffect, useMemo } from "react";
+import { createContext, useState, useContext, useMemo } from "react";
 import { quotes as initialQuotes } from "@/quotes";
 
 const QuotesContext = createContext();
 
+function setLikeCount () {
+  return initialQuotes.map((q) => ({ ...q, likeCount: 0 }));
+}
+
 export const QuotesProvider = ({ children }) => {
-  const [quotes, setQuotes] = useState([]);
+  const [quotes, setQuotes] = useState(setLikeCount());
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    setQuotes(initialQuotes.map((q) => ({ ...q, likeCount: 0 })));
-    setIsLoaded(true);
-  }, []);
-
+  
+  
   const handleLike = () => {
     setQuotes((prev) =>
       prev.map((q, i) => (i === currentIndex ? { ...q, likeCount: q.likeCount + 1 } : q))
@@ -28,7 +28,7 @@ export const QuotesProvider = ({ children }) => {
   const likedQuotes = useMemo(() => quotes.filter((q) => q.likeCount > 0), [quotes]);
 
   return (
-    <QuotesContext.Provider value={{ currentQuote, handleLike, handleNext, isLoaded, likedQuotes }}>
+    <QuotesContext.Provider value={{ currentQuote, handleLike, handleNext,  likedQuotes }}>
       {children}
     </QuotesContext.Provider>
   );

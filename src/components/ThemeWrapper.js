@@ -14,12 +14,14 @@ export default function ThemeWrapper({ children, fontVars }) {
         </div>
         <button 
           onClick={toggleTheme}
-          className="px-3 py-1 rounded-full bg-emerald-500 text-white text-sm font-bold"
+          className="px-3 py-1 rounded-full bg-emerald-800 text-white text-sm font-bold"
         >
           {isDarkMode ? "☀️ Light" : "🌙 Dark"}
         </button>
       </nav>
+      
       {children}
+    
     </body>
   );
 }
