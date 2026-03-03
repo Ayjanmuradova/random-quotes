@@ -1,4 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { UserProvider } from "@/context/UserContext";
+import { QuotesProvider } from "@/context/QuotesContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import ThemeWrapper from "@/components/ThemeWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata = {
   title: "Random Quotes App",
   description: "A simple app that displays random quotes.",
@@ -19,11 +24,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <ThemeProvider>
+        <UserProvider>
+          <QuotesProvider>
+            
+            <ThemeWrapper fontVars={`${geistSans.variable} ${geistMono.variable}`}>
+              {children}
+            </ThemeWrapper>
+          </QuotesProvider>
+        </UserProvider>
+      </ThemeProvider>
     </html>
   );
 }
