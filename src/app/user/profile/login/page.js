@@ -25,7 +25,7 @@ export default function LoginPage() {
           </div>
 
           <Button className="w-full bg-emerald-800 hover:bg-emerald-900 text-white transition-all">Login</Button>
-            <p className="text-sm text-center text-zinc-600 dark:text-zinc-400">Don't have an account? 
+            <p className="text-sm text-center text-zinc-600 dark:text-zinc-400">Don\'t have an account? 
               <Link href="/user/profile/signup" className="text-blue-600 dark:text-blue-400 hover:underline font-bold">Sign up</Link></p>
         </CardContent>
       </Card>
