@@ -1,9 +1,15 @@
 "use client";
 import { createContext, useContext } from "react";
+import { ReactNode } from "react";
 
-const UserContext = createContext();
+interface User {
+  name: string;
+  email: string;
+}
 
-export const UserProvider = ({ children }) => {
+const UserContext = createContext<User | undefined>(undefined);
+
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const user = {
     name: "Ayjan Muradova",
     email: "ayjan.muradova@code2career.eu"

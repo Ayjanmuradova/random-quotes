@@ -1,14 +1,28 @@
 "use client";
 import { createContext, useState, useContext, useMemo } from "react";
 import { quotes as initialQuotes } from "@/quotes";
+import { ReactNode } from "react";
 
-const QuotesContext = createContext();
+interface QuoteType{
+  quote: string;
+  author: string;
+  likeCount: number;
+}
+
+interface QuotesContextType {
+  currentQuote: QuoteType | null;
+  handleLike: () => void;
+  handleNext: () => void; 
+  likedQuotes: QuoteType[];
+}
+
+const QuotesContext = createContext<QuotesContextType | undefined>(undefined);
 
 function setLikeCount () {
   return initialQuotes.map((q) => ({ ...q, likeCount: 0 }));
 }
 
-export const QuotesProvider = ({ children }) => {
+export const QuotesProvider = ({ children }: { children: ReactNode }) => {
   const [quotes, setQuotes] = useState(setLikeCount());
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -34,4 +48,10 @@ export const QuotesProvider = ({ children }) => {
   );
 };
 
-export const useQuotes = () => useContext(QuotesContext);
+export function useQuotes() {
+  const context = useContext(QuotesContext);
+  if (context === undefined) {
+    throw new Error("useQuotes must be used within a QuotesProvider");
+  }
+  return context;
+}

@@ -1,14 +1,25 @@
 "use client";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "next-themes";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
+import {type ReactNode, useEffect, useState } from "react";
 
-export default function ThemeWrapper({ children, fontVars }) {
-  const { isDarkMode, toggleTheme } = useTheme();
-  const { user} = useUser();
+interface ThemeWrapperProps {
+  children: ReactNode;
+  fontVars: string;
+}
+
+export default function ThemeWrapper({ children, fontVars }: ThemeWrapperProps) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const user = useUser();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <body className={`${fontVars} antialiased ${isDarkMode ? "bg-slate-900 text-white" : "bg-white text-black"} transition-colors duration-300`}>
+    <body className={`${fontVars} antialiased bg-white text-black dark:bg-slate-900 dark:text-white transition-colors duration-300`}>
       <nav className="p-4 flex justify-between border-b border-slate-700">
         <div className="flex gap-4">
           <Link href="/" className="hover:text-emerald-500">🏠 Main page</Link>
@@ -19,7 +30,7 @@ export default function ThemeWrapper({ children, fontVars }) {
           {user ? (
             
             <span className="text-sm font-semibold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-              👤 {user}
+              👤 user
             </span>
           ) : (
            
@@ -31,10 +42,10 @@ export default function ThemeWrapper({ children, fontVars }) {
             </Link>
           )}
         <button 
-          onClick={toggleTheme}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="px-3 py-1 rounded-full bg-emerald-800 text-white text-sm font-bold"
         >
-          {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+          {mounted ? (theme === "dark" ? "☀️ Light" : "🌙 Dark") : "🌙 Dark"}
         </button>
         </div>
       </nav>
