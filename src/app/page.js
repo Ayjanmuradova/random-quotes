@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className='min-h-dvh flex items-center bg-slate-900'>
+    <main className='min-h-[80vh] flex items-center justify-center'>
       <QuoteCard /> 
     </main>
   );

@@ -4,11 +4,11 @@ import { useUser } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
 
 export default function UserQuotesPage() {
-  const { likedQuotes, isLoaded } = useQuotes();
+  const { likedQuotes } = useQuotes();
   const { name, email, role, location } = useUser();
   const { isDarkMode } = useTheme();
 
-  if (!isLoaded) return <p className="p-10 text-center">Loading...</p>;
+  
 
   return (
     <main className="p-10 max-w-3xl mx-auto">
