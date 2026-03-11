@@ -1,6 +1,5 @@
 "use client";
-import { createContext, useContext } from "react";
-import { ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 
 interface User {
   name: string;
