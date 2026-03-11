@@ -30,7 +30,7 @@ export const QuotesProvider = ({ children }: { children: ReactNode }) => {
   
   const handleLike = () => {
     setQuotes((prev) =>
-      prev.map((q, i) => (i === currentIndex ? { ...q, likeCount: q.likeCount + 1 } : q))
+      prev.map((q, i) => (i === currentIndex ? { ...q, isLiked: !q.isLiked, likeCount: q.isLiked ? q.likeCount - 1 : q.likeCount + 1 } : q))
     );
   };
 
