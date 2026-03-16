@@ -1,45 +1,57 @@
 "use client";
 import { useTheme } from "next-themes";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 import {type ReactNode, useEffect, useState } from "react";
 
 interface ThemeWrapperProps {
   children: ReactNode;
-  fontVars: string;
+  
 }
 
-export default function ThemeWrapper({ children, fontVars }: ThemeWrapperProps) {
+export default function ThemeWrapper({ children }: ThemeWrapperProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const user = useUser();
+  const {user , isLoading} = useUser();// Get the user object and loading state from Auth0
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return (
-    <body className={`${fontVars} antialiased bg-white text-black dark:bg-slate-900 dark:text-white transition-colors duration-300`}>
+    <div className="flex flex-col min-h-screen">
       <nav className="p-4 flex justify-between border-b border-slate-700">
-        <div className="flex gap-4">
+        {!isLoading && user && (
+          <div className="flex gap-4">
           <Link href="/" className="hover:text-emerald-500">🏠 Main page</Link>
-          <Link href="/user/quotes" className="hover:text-emerald-500">❤️ My profile</Link>
-          
-        </div>
+          <Link href="/user/quotes" className="hover:text-emerald-500">❤️ Liked Quotes</Link>
+          <Link href="/user/profile" className="hover:text-emerald-500"> 👤 Profile</Link>
+            </div>
+          )}
+        
         <div className="flex gap-6 items-center">
-          {user ? (
-            
+          {!isLoading &&(
+          user ? (
+            <div className="flex items-center gap-4">
             <span className="text-sm font-semibold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-              👤 user
+              👤 {user.name}
             </span>
-          ) : (
-           
-            <Link 
-              href="/user/profile/login" 
+          
+           <a
+              href="/auth/logout"
+              className="hover:text-emerald-500 font-medium transition-colors flex items-center gap-1"
+            >
+              🔒 Logout
+            </a>
+            </div>
+          ):(
+            
+            <a
+               href="/auth/login"
               className="hover:text-emerald-500 font-medium transition-colors flex items-center gap-1"
             >
               🔐 Login
-            </Link>
+            </a>)
           )}
         <button 
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -50,8 +62,10 @@ export default function ThemeWrapper({ children, fontVars }: ThemeWrapperProps) 
         </div>
       </nav>
       
-      {children}
+      <main className="flex-1">
+        {children}
+      </main>
     
-    </body>
+    </div>
   );
 }

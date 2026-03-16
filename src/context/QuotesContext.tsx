@@ -3,34 +3,50 @@ import { createContext, useState, useContext, useMemo } from "react";
 import { quotes as initialQuotes } from "@/quotes";
 import { ReactNode } from "react";
 
-interface QuoteType{
+interface Quote{
   quote: string;
   author: string;
   likeCount: number;
+  isLiked?: boolean;
 }
 
-interface QuotesContextType {
-  currentQuote: QuoteType | null;
+interface QuotesContextProps {
+  currentQuote: Quote | null;
   handleLike: () => void;
   handleNext: () => void; 
-  likedQuotes: QuoteType[];
+  likedQuotes: Quote[];
 }
 
-const QuotesContext = createContext<QuotesContextType | undefined>(undefined);
+const QuotesContext = createContext<QuotesContextProps| undefined>(undefined);
 
-function setLikeCount () {
-  return initialQuotes.map((q) => ({ ...q, likeCount: 0 }));
+function initializeQuotes () {
+  return initialQuotes.map((q) => ({
+     ...q, 
+     likeCount: 0 ,
+     isLiked: false
+    }));
 }
 
 export const QuotesProvider = ({ children }: { children: ReactNode }) => {
-  const [quotes, setQuotes] = useState(setLikeCount());
+  const [quotes, setQuotes] = useState(initializeQuotes());
   const [currentIndex, setCurrentIndex] = useState(0);
 
   
   
   const handleLike = () => {
     setQuotes((prev) =>
-      prev.map((q, i) => (i === currentIndex ? { ...q, likeCount: q.likeCount + 1 } : q))
+      prev.map((q, i) => {
+        if (i === currentIndex) {
+          const newIsLiked = !q.isLiked; // Beğenme durumunu tersine çevir
+          return { 
+            ...q, 
+            isLiked: newIsLiked,
+            // Like sayısını güncelle (beğenildiyse artır, beğenilmediyse azalt)
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1 
+          };
+        }
+        return q;
+      })
     );
   };
 
@@ -39,7 +55,7 @@ export const QuotesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const currentQuote = quotes[currentIndex] || null;
-  const likedQuotes = useMemo(() => quotes.filter((q) => q.likeCount > 0), [quotes]);
+  const likedQuotes = useMemo(() => quotes.filter((q) => q.isLiked), [quotes]);
 
   return (
     <QuotesContext.Provider value={{ currentQuote, handleLike, handleNext,  likedQuotes }}>

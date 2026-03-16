@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 
 export default function UserQuotesPage() {
   const { likedQuotes } = useQuotes();
-  const { name, email } = useUser();
+  const { name, email, role } = useUser();
   
 
   
@@ -20,7 +20,7 @@ export default function UserQuotesPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{name}</h1>
-            <p className="text-emerald-500 text-sm font-medium">User</p>
+            <p className="text-emerald-500 text-sm font-medium">{role}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm opacity-80">
