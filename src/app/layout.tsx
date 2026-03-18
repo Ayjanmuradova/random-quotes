@@ -1,11 +1,12 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { UserProvider } from "@/context/UserContext";
+
 import { QuotesProvider } from "@/context/QuotesContext";
 import { ThemeProvider } from "next-themes";
 import ThemeWrapper from "@/components/ThemeWrapper";
 import "./globals.css";
 import { auth0 } from "@/lib/auth0";
-import LoginButton from "@/components/LoginButton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black dark:bg-slate-900 dark:text-white transition-colors duration-300`}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <UserProvider>
+        
           
             
             <ThemeWrapper>
@@ -40,16 +41,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                        ) : (
                         <main className="min-h-dvh flex items-center justify-center">
                          <div>
-                           <p className="">
+                           <p>
                              Welcome! Please log in to access your protected content.
                            </p>
-                           <LoginButton />
+                           <Button asChild size="lg">
+                             <Link href="/auth/login">🔐 Login</Link>
+                           </Button>
                          </div>
                          </main>
                        )} 
             </ThemeWrapper>
           
-        </UserProvider>
+        
       </ThemeProvider>
       </body>
     </html>
