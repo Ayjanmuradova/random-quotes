@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { UserProvider } from "@/context/UserContext";
 import { QuotesProvider } from "@/context/QuotesContext";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeProvider } from "next-themes";
 import ThemeWrapper from "@/components/ThemeWrapper";
 import "./globals.css";
 
@@ -21,9 +21,9 @@ export const metadata = {
   description: "A simple app that displays random quotes.",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <UserProvider>
           <QuotesProvider>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
 
 export default function SignupPage(){
     return (
@@ -16,19 +17,19 @@ export default function SignupPage(){
         <CardContent className="space-y-4">
           
           <div className="space-y-2">
-            <label htmlFor="fullName" className="text-sm font-medium">Full Name</label>
+            <Label htmlFor="fullName">Full Name</Label>
             <Input id="fullName" type="text" placeholder="John Doe" required />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">Email</label>
+            <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" placeholder="John.doe@gmail.com" required />
           </div>
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">Password</label>
+            <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" placeholder="Create a password" required />
           </div>
-          <Button className="w-full bg-emerald-800 hover:bg-emerald-900 text-white transition-all">
+          <Button type='submit' className="w-full">
             Create Account
           </Button>
         

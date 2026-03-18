@@ -29,7 +29,8 @@ export default function QuoteCard () {
           className="absolute top-8 right-6 flex items-center justify-center gap-2 px-2 py-2 hover:scale-105 transition-transform active:scale-90"
         >
          <span className="text-l leading-none flex items-center">{currentQuote.likeCount > 0 ? "❤️" : "🤍"}</span> 
-          <span className="text-sm font-medium leading-none flex justify-end">Like </span>
+         <span className="text-l leading-none flex items-center">{currentQuote.isLiked ? "❤️" : "🤍"}</span> 
+          <span className="text-sm font-medium leading-none flex justify-end">{currentQuote.isLiked ? "Liked " : "Like "} {currentQuote.likeCount}</span>
         </Button>
         <div className="flex justify-center">
         <Button onClick={handleNext}>Next Quote</Button>

@@ -1,4 +1,9 @@
 // title is prop that we have to pass to Subtitle component
-export function Subtitle({title}){
+
+
+interface SubtitleProps {
+  title: string;
+}
+export function Subtitle({title}: SubtitleProps) {
     return <p className="text-lg">{title}</p>;
 }
