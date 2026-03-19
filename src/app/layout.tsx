@@ -6,7 +6,7 @@ import ThemeWrapper from "@/components/ThemeWrapper";
 import "./globals.css";
 import { auth0 } from "@/lib/auth0";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+
 
 
 const geistSans = Geist({
@@ -45,7 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                              Welcome! Please log in to access your protected content.
                            </p>
                            <Button asChild size="lg">
-                             <Link href="/auth/login">🔐 Login</Link>
+                             <a href="/auth/login">🔐 Login</a>
                            </Button>
                          </div>
                          </main>

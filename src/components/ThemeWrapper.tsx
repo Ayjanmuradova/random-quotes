@@ -20,18 +20,21 @@ export default function ThemeWrapper({ children }: ThemeWrapperProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <nav className="p-4 flex justify-between border-b border-slate-700">
+      <nav className="p-4 flex justify-between border-slate-700">
         {!isLoading && user && (
-          <div className="flex gap-4">
+          <div className="flex gap-6 items-center">
             <Link href="/" className="hover:text-emerald-500">
-              🏠 Main page
+              Main page
+            </Link>
+            <Link href="/user/quotes/new" className="hover:text-emerald-500">
+              New Quote
             </Link>
             <Link href="/user/quotes" className="hover:text-emerald-500">
               ❤️ Liked Quotes
             </Link>
             <Link href="/user/profile" className="hover:text-emerald-500">
               {" "}
-              👤 Profile
+              Profile
             </Link>
           </div>
         )}
@@ -41,19 +44,19 @@ export default function ThemeWrapper({ children }: ThemeWrapperProps) {
             (user ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-semibold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-                  👤 {user.name}
+                   {user.name}
                 </span>
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/auth/logout">🔒 Logout </Link>
+                  <a href="/auth/logout">Logout </a>
                 </Button>
               </div>
             ) : (
               <div className="flex items-center gap-4">
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/auth/login">🔐 Login</Link>
+                  <a href="/auth/login">Login</a>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/api/auth/signup">📝 Sign Up</Link>
+                  <a href="/api/auth/signup">Sign Up</a>
                 </Button>
               </div>
             ))}
