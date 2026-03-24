@@ -69,7 +69,7 @@ export default function ThemeWrapper({ children }: ThemeWrapperProps) {
         </div>
       </nav>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 m-auto">{children}</main>
     </div>
   );
 }

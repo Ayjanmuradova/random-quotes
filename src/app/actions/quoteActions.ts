@@ -32,10 +32,14 @@ export async function addQuote(
 
   // data validation
   // store in DB (next lesson)
- return new Promise((resolve, reject) => {
+ return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
         success: true,
+        data: {
+          author: result.data.author,
+          quote: result.data.quote,
+        }
       });
     }, 2000);
   });

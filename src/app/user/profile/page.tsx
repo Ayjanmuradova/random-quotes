@@ -20,8 +20,8 @@ export default async function Profile() {
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-sm mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <CardHeader className="flex flex-col items-center text-center pb-4">
+      <Card className="w-[450px] max-w-full mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader className="flex flex-col items-center text-center pt-8 pb-4">
           <div className="relative w-28 h-28 mb-4 rounded-full overflow-hidden border-4 border-emerald-50 dark:border-emerald-900/30 shadow-sm">
             <Image
               src={profileImage}
@@ -32,15 +32,15 @@ export default async function Profile() {
               priority
             />
           </div>
-          
+          <div className="w-full space-y-1.5 px-6">
           <CardTitle className="text-2xl font-bold tracking-tight">
             {user.name}
           </CardTitle>
           
-          <CardDescription className="text-emerald-600 dark:text-emerald-400 font-medium text-base mt-1">
+          <CardDescription className="text-emerald-700 dark:text-emerald-300 font-semibold text-lg px-4 mt-0.5">
             {user.email}
           </CardDescription>
-
+</div>
         </CardHeader>
         
         <CardContent className="text-center pt-4 border-t border-slate-100 dark:border-slate-800">

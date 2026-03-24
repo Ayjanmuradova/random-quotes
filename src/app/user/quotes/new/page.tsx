@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useActionState } from 'react';
+import { use, useActionState, useEffect } from 'react';
+import { FormError } from '@/components/FormError';
+import { useRouter } from 'next/navigation';
 import { addQuote, type NewQuoteFormState } from '@/app/actions/quoteActions';
 import { NewQuoteSchema } from '@/lib/schemas';
 import Link from 'next/link';
@@ -19,7 +21,7 @@ const initialState: NewQuoteFormState = {
 type NewQuoteInput = z.infer<typeof NewQuoteSchema>;
 
 export default function NewQuotePage() {
-  
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(addQuote, initialState);
 
   const {
@@ -29,14 +31,27 @@ export default function NewQuotePage() {
     mode: 'onChange', 
     resolver: zodResolver(NewQuoteSchema), 
   });
+  useEffect(() => {
+    if (state.success) {
+      const timer = setTimeout(() => {
+        router.push('/user/quotes');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.success, router]);
 
   if (state.success) {
     return (
-      <div className="container max-w-2xl py-20 text-center">
+      <div className="container max-w-2xl py-20 text-center space-y-4">
         <h1 className="text-3xl font-bold text-emerald-500 mb-4">Quote added successfully!</h1>
-        <Button asChild>
-           <Link href="/">Go to Home Page</Link>
-        </Button>
+        <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-lg italic">
+          "{state.data?.quote}"
+        </div>
+        <p className="font-semibold">- {state.data?.author}</p>
+        
+        <p className="text-sm text-slate-500 mt-4 animate-pulse">
+          Redirecting to quotes page...
+        </p>
       </div>
     );
   }
@@ -57,11 +72,10 @@ export default function NewQuotePage() {
             {...register('author')}
           />
         
-          {(clientFormErrors?.author || state.errors?.author) && (
-            <p id="author-error" className="text-sm text-red-500 font-medium">
-              {clientFormErrors?.author?.message || state.errors?.author?.join('; ')}
-            </p>
-          )}
+          <FormError 
+            id="author-error" 
+            error={clientFormErrors?.author?.message || state.errors?.author} 
+          />
         </div>
 
         <div className="grid w-full items-center gap-2">
@@ -76,11 +90,10 @@ export default function NewQuotePage() {
             {...register('quote')}
           />
          
-          {(clientFormErrors?.quote || state.errors?.quote) && (
-            <p id="quote-error" className="text-sm text-red-500 font-medium">
-              {clientFormErrors?.quote?.message || state.errors?.quote?.join('; ')}
-            </p>
-          )}
+          <FormError 
+            id="quote-error" 
+            error={clientFormErrors?.quote?.message || state.errors?.quote} 
+          />
         </div>
 
         <div className="flex gap-4">
