@@ -1,8 +1,6 @@
 'use server';
 
-import { z } from 'zod';
-
-
+import {NewQuoteSchema} from '@/lib/schemas';
 
 export type NewQuoteFormState = {
   success: boolean;
@@ -10,14 +8,6 @@ export type NewQuoteFormState = {
   data?: { author?: string; quote?: string }; 
 };
 
-const NewQuoteSchema = z.object({
-  author: z.string().trim()
-    .min(2, { message: 'Author name must be at least 2 characters.' })
-    .max(50, { message: 'Author name must be less than 50 characters.' }),
-  quote: z.string().trim()
-    .min(5, { message: 'Quote must be at least 5 characters.' })
-    .max(300, { message: 'Quote must be less than 300 characters.' }),
-});
 
 export async function addQuote(
   currentState: NewQuoteFormState,
