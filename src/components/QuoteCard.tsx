@@ -3,40 +3,37 @@
 import { useQuotes } from "@/context/QuotesContext";  
 import { Subtitle } from "./Subtitle";  
 import { Body2 } from "./Body2";  
-import { Button } from "./Button";
-import { useTheme } from "@/context/ThemeContext";
+import { Button } from "@/components/ui/button";
+import { Card } from  "@/components/ui/card";
+
+
 
 export default function QuoteCard () {
   const { currentQuote, handleLike, handleNext } = useQuotes();
-  const { isDarkMode } = useTheme();
+  
   
   if (!currentQuote) return null;
   
   return (
     
-    <div className={`relative max-w-md w-full mx-auto p-10 pt-24 rounded-xl flex flex-col gap-4 shadow-xl transition-all duration-300 border ${
-      isDarkMode 
-        ? "bg-slate-800 border-slate-700 text-white" 
-        : "bg-white border-slate-200 text-slate-900"
-    }`}>
+    <Card className="relative max-w-md w-full mx-auto p-10 pt-24 rounded-xl flex flex-col gap-4 shadow-xl transition-all duration-300 border bg-white border-slate-200 text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
       <div className="mt-2 flex flex-col gap-2">
       <Subtitle title={currentQuote.quote} />
-      <Body2>--{currentQuote.author}</Body2>
+      <Body2 className="text-end">--{currentQuote.author}</Body2>
       </div>
       
         <Button 
           onClick={handleLike} 
-          className="absolute top-8 right-6 flex items-center justify-center gap-2 px-2 py-2 hover:scale-105 transition-transform active:scale-90"
+          className="absolute top-8 right-6 flex items-center justify-center gap-2 px-2 py-2 transition-all duration-200 min-w-[90px]"
         >
-         <span className="text-l leading-none flex items-center">{currentQuote.likeCount > 0 ? "❤️" : "🤍"}</span> 
-         <span className="text-l leading-none flex items-center">{currentQuote.isLiked ? "❤️" : "🤍"}</span> 
-          <span className="text-sm font-medium leading-none flex justify-end">{currentQuote.isLiked ? "Liked " : "Like "} {currentQuote.likeCount}</span>
+         <span className="text-l leading-none">{currentQuote.isLiked ? "❤️" : "🤍"}</span> 
+          <span className="text-sm font-medium leading-none">{currentQuote.isLiked ? "Liked" : "Like"} {currentQuote.likeCount}</span>
         </Button>
         <div className="flex justify-center">
         <Button onClick={handleNext}>Next Quote</Button>
       </div>
       
 
-    </div>
+    </Card>
   );
 }

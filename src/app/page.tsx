@@ -1,14 +1,12 @@
-"use client";
-import QuoteCard from "@/components/QuoteCard";
-import Link from "next/link";
 
-export default function Home() {
+import HomeClient from "./HomeClient";
+
+export default async function Home() {
   return (
-    <main className='min-h-[80vh] flex items-center justify-center'>
-      <QuoteCard /> 
+    <main className='min-h-[80vh] flex flex-col items-center justify-center gap-6'>
+      <div className="action-card w-full max-w-2xl">
+        <HomeClient />
+      </div> 
     </main>
   );
 }
-<Link href="/user/quotes" className="text-white mt-4 underline text-sm">
-  Quotes on my profile
-</Link>

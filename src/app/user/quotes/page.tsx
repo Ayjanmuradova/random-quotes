@@ -1,11 +1,12 @@
 "use client";
 import { useQuotes } from "@/context/QuotesContext";
-import { useUser } from "@/context/UserContext";
+import { useUser} from "@auth0/nextjs-auth0/client";
+
 
 
 export default function UserQuotesPage() {
   const { likedQuotes } = useQuotes();
-  const { name, email } = useUser();
+  const { user, isLoading } = useUser();
   
 
   
@@ -16,15 +17,15 @@ export default function UserQuotesPage() {
       <section className="mb-8 p-6 rounded-3xl border bg-white border-slate-200 shadow-xl dark:bg-slate-800 dark:border-slate-700">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-2xl font-bold text-white">
-            {name[0]}
+            {user.name ? user.name.charAt(0).toUpperCase() : "U"}
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{name}</h1>
-            <p className="text-emerald-500 text-sm font-medium">User</p>
+            <h1 className="text-2xl font-bold">{user.name}</h1>
+            <p className="text-emerald-500 text-sm font-medium">Member</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm opacity-80">
-          <p>📧 {email}</p>
+          <p>📧 {user.email}</p>
         </div>
       </section>
 
