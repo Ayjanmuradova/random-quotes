@@ -61,6 +61,7 @@ export default function NewQuotePage() {
             className="resize-none"
             defaultValue={state.data?.quote}
             maxLength={300}
+            aria-describedby="quote-error"
             required
           />
           {state.errors?.quote && (
