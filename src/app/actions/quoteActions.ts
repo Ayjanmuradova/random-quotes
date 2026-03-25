@@ -1,46 +1,41 @@
 'use server';
 
-import {NewQuoteSchema} from '@/lib/schemas';
-
-export type NewQuoteFormState = {
-  success: boolean;
-  errors?: Record<string, string[]>; 
-  data?: { author?: string; quote?: string }; 
-};
-
+import { NewQuoteFormState } from '@/app/user/quotes/new/page';
+import { NewQuoteSchema } from '@/lib/schemas';
+import { Quote } from '@/types/quotes';
+import { createQuote } from '../services/quotes';
 
 export async function addQuote(
   currentState: NewQuoteFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<NewQuoteFormState> {
- 
   const rawData = {
-    author: formData.get('author')?.toString() ?? '',
-    quote: formData.get('quote')?.toString() ?? '',
+    author: formData.get('author') ?? '',
+    quote: formData.get('quote') ?? '',
   };
 
   const result = NewQuoteSchema.safeParse(rawData);
-  
 
   if (!result.success) {
     return {
       success: false,
-      errors: result.error.flatten().fieldErrors, 
-      data:rawData,
+      errors: result.error.flatten().fieldErrors,
+      data: { ...(rawData as Partial<Quote>) },
     };
   }
-
-  // data validation
-  // store in DB (next lesson)
- return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        data: {
-          author: result.data.author,
-          quote: result.data.quote,
-        }
-      });
-    }, 2000);
-  });
+  
+  try {
+    await createQuote(result.data);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (err) {
+    console.error('An error occured when saving a new quote to database');
+    return {
+      success: false,
+      message: 'An error occured when saving the quote, try again later.',
+      data: result.data,
+    };
+  }
 }

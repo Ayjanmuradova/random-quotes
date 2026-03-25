@@ -4,15 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { use, useActionState, useEffect } from 'react';
+import { useActionState, useEffect } from 'react';
 import { FormError } from '@/components/FormError';
 import { useRouter } from 'next/navigation';
-import { addQuote, type NewQuoteFormState } from '@/app/actions/quoteActions';
+import { addQuote } from '@/app/actions/quoteActions';
 import { NewQuoteSchema } from '@/lib/schemas';
-import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Quote } from '@/types/quotes';
+
+export type NewQuoteFormState = {
+  success: boolean;
+  errors?: Record<string, string[]>;
+  message?: string;
+  data?: Partial<Quote>;
+};
 
 const initialState: NewQuoteFormState = {
   success: false,
@@ -61,7 +68,11 @@ export default function NewQuotePage() {
       <h1 className="text-3xl font-bold mb-8">Create New Quote</h1>
       
       <form action={formAction} className="space-y-6">
-        
+        {state.message && (
+          <div className="p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-900/30 dark:text-red-400 font-medium">
+            {state.message}
+          </div>
+        )}
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="author-input">Author</Label>
           <Input 
