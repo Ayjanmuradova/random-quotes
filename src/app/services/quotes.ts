@@ -1,27 +1,18 @@
-// src/app/services/quotes.ts
-import { auth0 } from '@/lib/auth0';
 import { Collections, getDb } from '@/lib/mongo';
 import { NewQuoteInput, Quote } from '@/types/quotes';
 import { ObjectId } from 'mongodb';
 
-export async function createQuote(quote: NewQuoteInput): Promise<Quote> {
-  const session = await auth0.getSession();
-  const user = session?.user;
-
-  if (!user) {
-    throw new Error("Unauthorized");
-  }
-
+export async function createQuote(quote: NewQuoteInput, userId: string): Promise<Quote> {
+  
   const db = await getDb();
   const col = db.collection(Collections.quotes);
-
-  const now = new Date();
+  const now = new Date().toISOString();;
 
   const doc = {
-    likedBy: 0,
+    likedBy: [],
     createdAt: now,
     updatedAt: now,
-    userId: user.sub,
+    userId: userId,
     ...quote
   };
 
@@ -30,16 +21,13 @@ export async function createQuote(quote: NewQuoteInput): Promise<Quote> {
   return { 
     quote: doc.quote, 
     author: doc.author, 
-    likedBy: doc.likedBy 
+    likedBy: doc.likedBy,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt
   };
 }
 
-export async function updateQuote (id: string, updtateData: NewQuoteInput): Promise<Quote> {
-  const session = await auth0.getSession();
-  const user = session?.user;
-  if(!user) {
-    throw new Error("Unauthorized");
-  }
+export async function updateQuote (id: string, updtateData: NewQuoteInput, userId: string): Promise<Quote> {
 
   const db = await getDb();
   const col = db.collection(Collections.quotes);
@@ -48,11 +36,11 @@ export async function updateQuote (id: string, updtateData: NewQuoteInput): Prom
   if (!existingQuote) {
     throw new Error("Quote not found");
   }
-  if (existingQuote.userId !== user.sub) {
+  if (existingQuote.userId !== userId) {
     throw new Error("Unauthorized");
   }
 
-  const now = new Date();
+  const now = new Date().toISOString();;
   await col.updateOne(
     { _id: new ObjectId(id) },
     { $set: { 
@@ -64,7 +52,9 @@ export async function updateQuote (id: string, updtateData: NewQuoteInput): Prom
   return { 
     quote: updtateData.quote,
     author: updtateData.author,
-    likedBy: existingQuote.likedBy
+    likedBy: existingQuote.likedBy,
+    createdAt: existingQuote.createdAt,
+    updatedAt: now
   };
 }
 
@@ -80,16 +70,13 @@ export async function getQuoteById(id: string): Promise<Quote | null> {
     author: quote.author,
     quote: quote.quote,
     userId: quote.userId,
-    likedBy: quote.likedBy
+    likedBy: quote.likedBy,
+    createdAt: quote.createdAt,
+    updatedAt: quote.updatedAt
   };
 }
 
-export async function deleteQuote(id: string):Promise<boolean>{
-  const session = await auth0.getSession();
-  const user = session?.user;
-  if(!user) {
-    throw new Error("Unauthorized");
-  }
+export async function deleteQuote(id: string, userId: string):Promise<boolean>{
 
   const db = await getDb();
   const col = db.collection(Collections.quotes);
@@ -98,7 +85,7 @@ export async function deleteQuote(id: string):Promise<boolean>{
   if (!existingQuote) {
     throw new Error("Quote not found");
   }
-  if (existingQuote.userId !== user.sub) {
+  if (existingQuote.userId !== userId) {
     throw new Error("Unauthorized");
   }
 
@@ -115,6 +102,33 @@ export async function getQuotes(){
     quote: q.quote,
     author: q.author,
     userId: q.userId,
-    likedBy: q.likedBy || 0,
+    likedBy: q.likedBy || [],
+    createdAt: q.createdAt,
+    updatedAt: q.updatedAt
   }));
+}
+
+export async function toggleLike(id: string, userId: string){
+  const db = await getDb();
+  const col = db.collection(Collections.quotes);
+  const quote = await col.findOne({ _id: new ObjectId(id) });
+  if (!quote) {
+    throw new Error("Quote not found");
+  }
+
+  const likedByArray= Array.isArray(quote.likedBy) ? quote.likedBy : [];
+  const hasLiked = likedByArray.includes(userId);
+
+  if (hasLiked) {
+    await col.updateOne(
+      { _id: new ObjectId(id) },
+      { $pull: { likedBy: userId } }
+    );
+  } else {
+    await col.updateOne(
+      { _id: new ObjectId(id) },
+      { $addToSet: { likedBy: userId } }
+    );
+    return true;
+  }
 }

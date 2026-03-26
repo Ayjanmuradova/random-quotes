@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useState, useContext, useMemo, useEffect, ReactNode } from "react";
-import { fetchAllQuotes } from "@/app/actions/quoteActions";
+import { fetchAllQuotes, toggleQuoteLikeAction } from "@/app/actions/quoteActions";
 
 interface Quote {
   _id?: string;
@@ -20,24 +20,21 @@ interface QuotesContextProps {
 const QuotesContext = createContext<QuotesContextProps | undefined>(undefined);
 
 export const QuotesProvider = ({ children }: { children: ReactNode }) => {
-
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     fetchAllQuotes().then((data) => {
       if (data && data.length > 0) {
-        const formattedData = data.map((q: any) => ({
-          ...q,
-          likeCount: q.likedBy || 0,
-          isLiked: false
-        }));
-        setQuotes(formattedData);
+        setQuotes(data);
       }
     });
   }, []);
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    const quote = quotes[currentIndex];
+    if (!quote || !quote._id) return;
+
     setQuotes((prev) =>
       prev.map((q, i) => {
         if (i === currentIndex) {
@@ -51,6 +48,24 @@ export const QuotesProvider = ({ children }: { children: ReactNode }) => {
         return q;
       })
     );
+    const result = await toggleQuoteLikeAction(quote._id);
+
+    if (!result?.success) {
+      alert("Please log in to like quotes! ");
+      setQuotes((prev) =>
+        prev.map((q, i) => {
+          if (i === currentIndex) {
+            const revertedIsLiked = !q.isLiked;
+            return {
+              ...q,
+              isLiked: revertedIsLiked,
+              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+            };
+          }
+          return q;
+        })
+      );
+    }
   };
 
   const handleNext = () => {
