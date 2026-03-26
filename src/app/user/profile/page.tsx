@@ -19,10 +19,10 @@ export default async function Profile() {
   const profileImage = user.picture || "https://s.gravatar.com/avatar/default?s=200";
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-      <Card className="w-[450px] max-w-full mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <div className="min-h-[80vh] flex flex-col items-center py-6 px-4 gap-4">
+      <Card className="w-[400px] max-w-full mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-col items-center text-center pt-8 pb-4">
-          <div className="relative w-28 h-28 mb-4 rounded-full overflow-hidden border-4 border-emerald-50 dark:border-emerald-900/30 shadow-sm">
+          <div className="relative w-28 h-28 mb-2 rounded-full overflow-hidden border-4 border-emerald-50 dark:border-emerald-900/30 shadow-sm">
             <Image
               src={profileImage}
               alt={user.name || "Profile Picture"}

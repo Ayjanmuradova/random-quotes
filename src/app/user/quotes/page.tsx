@@ -2,15 +2,14 @@
 import { useQuotes } from "@/context/QuotesContext";
 import { useUser} from "@auth0/nextjs-auth0/client";
 
-
-
 export default function UserQuotesPage() {
   const { likedQuotes } = useQuotes();
   const { user, isLoading } = useUser();
   
 
-  
-
+  if (isLoading) {
+    return <div className="p-10 text-center">Loading...</div>;
+  }
   return (
     <main className="p-10 max-w-3xl mx-auto">
       

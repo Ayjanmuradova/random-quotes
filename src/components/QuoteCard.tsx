@@ -17,7 +17,7 @@ export default function QuoteCard () {
   return (
     
     <Card className="relative max-w-md w-full mx-auto p-10 pt-24 rounded-xl flex flex-col gap-4 shadow-xl transition-all duration-300 border bg-white border-slate-200 text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
-      <div className="mt-2 flex flex-col gap-2">
+      <div className="mt-2 flex flex-col gap-2 break-words">
       <Subtitle title={currentQuote.quote} />
       <Body2 className="text-end">--{currentQuote.author}</Body2>
       </div>

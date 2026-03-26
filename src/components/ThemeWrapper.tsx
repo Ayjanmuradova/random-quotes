@@ -26,11 +26,15 @@ export default function ThemeWrapper({ children }: ThemeWrapperProps) {
             <Link href="/" className="hover:text-emerald-500">
               Main page
             </Link>
+            
+            <Link href="/user/quotes" className="hover:text-emerald-500">
+              Liked Quotes
+            </Link>
             <Link href="/user/quotes/new" className="hover:text-emerald-500">
               New Quote
             </Link>
-            <Link href="/user/quotes" className="hover:text-emerald-500">
-              ❤️ Liked Quotes
+            <Link href="/user/my-quotes" className="hover:text-emerald-500">
+              My Quotes
             </Link>
             <Link href="/user/profile" className="hover:text-emerald-500">
               {" "}
