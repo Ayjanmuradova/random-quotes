@@ -81,6 +81,8 @@ export default function NewQuotePage() {
             defaultValue={state.data?.author}
             aria-describedby='author-error'
             {...register('author')}
+            required
+            maxLength={50}
           />
         
           <FormError 
@@ -99,6 +101,8 @@ export default function NewQuotePage() {
             rows={5}
             aria-describedby='quote-error'
             {...register('quote')}
+            required
+            maxLength={300}
           />
          
           <FormError 

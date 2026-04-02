@@ -2,10 +2,14 @@ import { Collections, getDb } from '@/lib/mongo';
 import { NewQuoteInput, Quote } from '@/types/quotes';
 import { ObjectId } from 'mongodb';
 
+async function getQuotesCollection() {
+  const db = await getDb();
+  return db.collection(Collections.quotes);
+}
+
 export async function createQuote(quote: NewQuoteInput, userId: string): Promise<Quote> {
   
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+  const col = await getQuotesCollection();
   const now = new Date().toISOString();;
 
   const doc = {
@@ -27,10 +31,9 @@ export async function createQuote(quote: NewQuoteInput, userId: string): Promise
   };
 }
 
-export async function updateQuote (id: string, updtateData: NewQuoteInput, userId: string): Promise<Quote> {
+export async function updateQuote (id: string, updateData: NewQuoteInput, userId: string): Promise<Quote> {
 
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+  const col = await getQuotesCollection();
 
   const existingQuote = await col.findOne({ _id: new ObjectId(id) });
   if (!existingQuote) {
@@ -44,14 +47,14 @@ export async function updateQuote (id: string, updtateData: NewQuoteInput, userI
   await col.updateOne(
     { _id: new ObjectId(id) },
     { $set: { 
-      quote: updtateData.quote,
-      author: updtateData.author,
+      quote: updateData.quote,
+      author: updateData.author,
       updatedAt: now
      } }
   );
   return { 
-    quote: updtateData.quote,
-    author: updtateData.author,
+    quote: updateData.quote,
+    author: updateData.author,
     likedBy: existingQuote.likedBy,
     createdAt: existingQuote.createdAt,
     updatedAt: now
@@ -59,8 +62,7 @@ export async function updateQuote (id: string, updtateData: NewQuoteInput, userI
 }
 
 export async function getQuoteById(id: string): Promise<Quote | null> {
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+  const col = await getQuotesCollection();
   const quote = await col.findOne({ _id: new ObjectId(id) });
   
   if (!quote) return null;
@@ -78,8 +80,7 @@ export async function getQuoteById(id: string): Promise<Quote | null> {
 
 export async function deleteQuote(id: string, userId: string):Promise<boolean>{
 
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+ const col = await getQuotesCollection();
 
   const existingQuote = await col.findOne({ _id: new ObjectId(id) });
   if (!existingQuote) {
@@ -94,8 +95,7 @@ export async function deleteQuote(id: string, userId: string):Promise<boolean>{
 }
 
 export async function getQuotes(){
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+ const col = await getQuotesCollection();
   const allQuotes = await col.find().sort({ createdAt: -1 }).toArray();
   return allQuotes.map(q => ({
     _id: q._id.toString(),
@@ -109,8 +109,7 @@ export async function getQuotes(){
 }
 
 export async function toggleLike(id: string, userId: string){
-  const db = await getDb();
-  const col = db.collection(Collections.quotes);
+  const col = await getQuotesCollection();
   const quote = await col.findOne({ _id: new ObjectId(id) });
   if (!quote) {
     throw new Error("Quote not found");

@@ -1,3 +1,5 @@
+"use client"
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -11,7 +13,6 @@ interface MyQuoteCardProps {
 
 export default function MyQuoteCard({ id, quote, author }: MyQuoteCardProps) {
  
-  const deleteAction = removeQuote.bind(null, id);
 
   return (
     <Card className="p-6 flex flex-col justify-between gap-4 shadow-md bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 transition-all hover:shadow-lg">
@@ -25,12 +26,9 @@ export default function MyQuoteCard({ id, quote, author }: MyQuoteCardProps) {
          
           <Link href={`/user/quotes/${id}/edit`}>Edit</Link>
         </Button>
-
-        <form action={deleteAction}>
-          <Button variant="destructive" size="sm" type="submit">
-            Delete
-          </Button>
-        </form>
+        <Button variant="destructive" size="sm" onClick={() => removeQuote(id)}>
+          Delete
+        </Button>
       </div>
     </Card>
   );
