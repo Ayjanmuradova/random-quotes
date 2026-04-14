@@ -49,7 +49,7 @@ export default function NewQuotePage() {
 
   if (state.success) {
     return (
-      <div className="container max-w-2xl py-20 text-center space-y-4">
+      <div className="container max-w-4xl py-20 text-center space-y-4">
         <h1 className="text-3xl font-bold text-emerald-500 mb-4">Quote added successfully!</h1>
         <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-lg italic">
           "{state.data?.quote}"
@@ -64,7 +64,7 @@ export default function NewQuotePage() {
   }
 
   return (
-    <div className="container max-w-2xl py-10">
+    <div className="container max-w-4xl py-10">
       <h1 className="text-3xl font-bold mb-8">Create New Quote</h1>
       
       <form action={formAction} className="space-y-6">

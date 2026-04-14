@@ -1,45 +1,53 @@
-"use client";
-import { useQuotes } from "@/context/QuotesContext";
-import { useUser} from "@auth0/nextjs-auth0/client";
+import { auth0 } from "@/lib/auth0";
+import { getQuotes } from "@/app/services/quotes";
+import MyQuoteCard from "@/components/MyQuoteCard";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export default function UserQuotesPage() {
-  const { likedQuotes } = useQuotes();
-  const { user, isLoading } = useUser();
-  
+export default async function QuotesPage() {
+  const session = await auth0.getSession();
+  const user = session?.user;
 
-  if (isLoading) {
-    return <div className="p-10 text-center">Loading...</div>;
+  if (!user?.sub) {
+    return <div className="p-10 text-center text-slate-500">Please log in to see your quotes.</div>;
   }
-  return (
-    <main className="p-10 max-w-3xl mx-auto">
-      
-      <section className="mb-8 p-6 rounded-3xl border bg-white border-slate-200 shadow-xl dark:bg-slate-800 dark:border-slate-700">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-2xl font-bold text-white">
-            {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{user.name}</h1>
-            <p className="text-emerald-500 text-sm font-medium">Member</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm opacity-80">
-          <p>📧 {user.email}</p>
-        </div>
-      </section>
 
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        ❤️ Liked Quotes: <span className="text-sm bg-emerald-500/20 text-black-500 px-2 py-0.5 rounded-full">{likedQuotes.length}</span>
-      </h2>
-      
-      <div className="space-y-4">
-        {likedQuotes.map((item, index) => (
-          <div key={index} className="p-6 rounded-2xl border bg-white border-slate-100 shadow-sm dark:bg-slate-800 dark:border-slate-700">
-            <p className="italic text-lg mb-2">"{item.quote}"</p>
-            <p className="text-sm opacity-60">— {item.author}</p>
-          </div>
-        ))}
+  const myQuotes = await getQuotes(user.sub);
+
+  return (
+    <main className="p-10 max-w-4xl mx-auto min-h-[80vh]">
+    
+      <div className="flex justify-between items-center mb-8 border-b pb-4 border-slate-200 dark:border-slate-800">
+        <h1 className="text-3xl font-bold flex items-center gap-3 tracking-tight">
+          My Created Quotes 
+          <span className="text-sm bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full">
+            {myQuotes.length}
+          </span>
+        </h1>
+        <Button asChild>
+          <Link href="/user/quotes/new">Add New Quote</Link>
+        </Button>
       </div>
+    
+      <div className="space-y-4">
+        {myQuotes.length === 0 ? (
+          <div className="p-12 text-center text-slate-500 border-2 border-dashed border-slate-300 rounded-2xl dark:border-slate-700 bg-slate-50 dark:bg-slate-900/20">
+            You haven't added any quotes yet. Click the "Add New Quote" button to start!
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2"> 
+            {myQuotes.map((item) => (
+              <MyQuoteCard 
+                key={item._id} 
+                id={item._id as string} 
+                quote={item.quote} 
+                author={item.author} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
     </main>
   );
 }

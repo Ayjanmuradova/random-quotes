@@ -10,7 +10,7 @@ async function getQuotesCollection() {
 export async function createQuote(quote: NewQuoteInput, userId: string): Promise<Quote> {
   
   const col = await getQuotesCollection();
-  const now = new Date().toISOString();;
+  const now = new Date().toISOString();
 
   const doc = {
     likedBy: [],
@@ -53,6 +53,7 @@ export async function updateQuote (id: string, updateData: NewQuoteInput, userId
      } }
   );
   return { 
+    userId: existingQuote.userId,
     quote: updateData.quote,
     author: updateData.author,
     likedBy: existingQuote.likedBy,
@@ -94,9 +95,10 @@ export async function deleteQuote(id: string, userId: string):Promise<boolean>{
   return true;
 }
 
-export async function getQuotes(){
+export async function getQuotes(userId?: string){
  const col = await getQuotesCollection();
-  const allQuotes = await col.find().sort({ createdAt: -1 }).toArray();
+ const query = userId ? { userId: userId } : {};
+  const allQuotes = await col.find(query).sort({ createdAt: -1 }).toArray();
   return allQuotes.map(q => ({
     _id: q._id.toString(),
     quote: q.quote,
@@ -116,9 +118,9 @@ export async function toggleLike(id: string, userId: string){
   }
 
   const likedByArray= Array.isArray(quote.likedBy) ? quote.likedBy : [];
-  const hasLiked = likedByArray.includes(userId);
+  const liked = likedByArray.includes(userId);
 
-  if (hasLiked) {
+  if (liked) {
     await col.updateOne(
       { _id: new ObjectId(id) },
       { $pull: { likedBy: userId } }
@@ -130,4 +132,21 @@ export async function toggleLike(id: string, userId: string){
     );
     return true;
   }
+}
+
+export async function getLikedQuotes(userId: string) {
+  const col = await getQuotesCollection();
+  const query = { likedBy: userId };
+
+  const likedQuotes = await col.find(query).sort({ createdAt: -1 }).toArray();
+  
+  return likedQuotes.map(q => ({
+    _id: q._id.toString(),
+    quote: q.quote,
+    author: q.author,
+    userId: q.userId,
+    likedBy: q.likedBy || [],
+    createdAt: q.createdAt,
+    updatedAt: q.updatedAt
+  }));
 }
