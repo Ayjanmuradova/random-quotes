@@ -13,6 +13,7 @@ interface Quote {
 interface QuotesContextProps {
   currentQuote: Quote | null;
   handleLike: () => void;
+  toggleLikeById: (id: string) => void;
   handleNext: () => void;
   likedQuotes: Quote[];
 }
@@ -68,6 +69,39 @@ export const QuotesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const toggleLikeById = async (id: string) => {
+    setQuotes((prev) =>
+      prev.map((q) => {
+        if (q._id === id) {
+          const newIsLiked = !q.isLiked;
+          return {
+            ...q,
+            isLiked: newIsLiked,
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+          };
+        }
+        return q;
+      })
+    );
+    const result = await toggleQuoteLikeAction(id);
+    if (!result?.success) {
+      setQuotes((prev) =>
+        prev.map((q) => {
+          if (q._id === id) {
+            const revertedIsLiked = !q.isLiked;
+            return {
+              ...q,
+              isLiked: revertedIsLiked,
+              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+            };
+          }
+          return q;
+        })
+      );
+    }
+  };
+
+
   const handleNext = () => {
     if (quotes.length > 0) {
       setCurrentIndex(Math.floor(Math.random() * quotes.length));
@@ -78,7 +112,7 @@ export const QuotesProvider = ({ children }: { children: ReactNode }) => {
   const likedQuotes = useMemo(() => quotes.filter((q) => q.isLiked), [quotes]);
 
   return (
-    <QuotesContext.Provider value={{ currentQuote, handleLike, handleNext, likedQuotes }}>
+    <QuotesContext.Provider value={{ currentQuote, handleLike, toggleLikeById, handleNext, likedQuotes }}>
       {children}
     </QuotesContext.Provider>
   );
