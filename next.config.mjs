@@ -4,7 +4,18 @@ const nextConfig = {
   reactCompiler: true,
   images: {
     remotePatterns: [
-      new URL('https://lh3.googleusercontent.com/**')
+      {
+        protocol: 'https',
+        hostname: 's.gravatar.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com', 
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      }
     ]
   }
 };

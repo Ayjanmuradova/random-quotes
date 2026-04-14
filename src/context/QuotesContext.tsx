@@ -1,9 +1,9 @@
 "use client";
-import { createContext, useState, useContext, useMemo } from "react";
-import { quotes as initialQuotes } from "@/quotes";
-import { ReactNode } from "react";
+import { createContext, useState, useContext, useMemo, useEffect, ReactNode } from "react";
+import { fetchAllQuotes, toggleQuoteLikeAction } from "@/app/actions/quoteActions";
 
-interface Quote{
+interface Quote {
+  _id?: string;
   quote: string;
   author: string;
   likeCount: number;
@@ -13,52 +13,106 @@ interface Quote{
 interface QuotesContextProps {
   currentQuote: Quote | null;
   handleLike: () => void;
-  handleNext: () => void; 
+  toggleLikeById: (id: string) => void;
+  handleNext: () => void;
   likedQuotes: Quote[];
 }
 
-const QuotesContext = createContext<QuotesContextProps| undefined>(undefined);
-
-function initializeQuotes () {
-  return initialQuotes.map((q) => ({
-     ...q, 
-     likeCount: 0 ,
-     isLiked: false
-    }));
-}
+const QuotesContext = createContext<QuotesContextProps | undefined>(undefined);
 
 export const QuotesProvider = ({ children }: { children: ReactNode }) => {
-  const [quotes, setQuotes] = useState(initializeQuotes());
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  
-  
-  const handleLike = () => {
+  useEffect(() => {
+    fetchAllQuotes().then((data) => {
+      if (data && data.length > 0) {
+        setQuotes(data);
+      }
+    });
+  }, []);
+
+  const handleLike = async () => {
+    const quote = quotes[currentIndex];
+    if (!quote || !quote._id) return;
+
     setQuotes((prev) =>
       prev.map((q, i) => {
         if (i === currentIndex) {
-          const newIsLiked = !q.isLiked; // Beğenme durumunu tersine çevir
-          return { 
-            ...q, 
+          const newIsLiked = !q.isLiked;
+          return {
+            ...q,
             isLiked: newIsLiked,
-            // Like sayısını güncelle (beğenildiyse artır, beğenilmediyse azalt)
-            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1 
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
           };
         }
         return q;
       })
     );
+    const result = await toggleQuoteLikeAction(quote._id);
+
+    if (!result?.success) {
+      alert("Please log in to like quotes! ");
+      setQuotes((prev) =>
+        prev.map((q, i) => {
+          if (i === currentIndex) {
+            const revertedIsLiked = !q.isLiked;
+            return {
+              ...q,
+              isLiked: revertedIsLiked,
+              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+            };
+          }
+          return q;
+        })
+      );
+    }
   };
 
+  const toggleLikeById = async (id: string) => {
+    setQuotes((prev) =>
+      prev.map((q) => {
+        if (q._id === id) {
+          const newIsLiked = !q.isLiked;
+          return {
+            ...q,
+            isLiked: newIsLiked,
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+          };
+        }
+        return q;
+      })
+    );
+    const result = await toggleQuoteLikeAction(id);
+    if (!result?.success) {
+      setQuotes((prev) =>
+        prev.map((q) => {
+          if (q._id === id) {
+            const revertedIsLiked = !q.isLiked;
+            return {
+              ...q,
+              isLiked: revertedIsLiked,
+              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+            };
+          }
+          return q;
+        })
+      );
+    }
+  };
+
+
   const handleNext = () => {
-    setCurrentIndex(Math.floor(Math.random() * quotes.length));
+    if (quotes.length > 0) {
+      setCurrentIndex(Math.floor(Math.random() * quotes.length));
+    }
   };
 
   const currentQuote = quotes[currentIndex] || null;
   const likedQuotes = useMemo(() => quotes.filter((q) => q.isLiked), [quotes]);
 
   return (
-    <QuotesContext.Provider value={{ currentQuote, handleLike, handleNext,  likedQuotes }}>
+    <QuotesContext.Provider value={{ currentQuote, handleLike, toggleLikeById, handleNext, likedQuotes }}>
       {children}
     </QuotesContext.Provider>
   );
