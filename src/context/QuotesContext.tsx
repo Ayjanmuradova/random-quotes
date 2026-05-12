@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useState, useContext, useMemo, useEffect, ReactNode } from "react";
+import { createContext, useState, useContext, useMemo, useEffect, useCallback, ReactNode } from "react";
 import { fetchAllQuotes, toggleQuoteLikeAction } from "@/app/actions/quoteActions";
 
 interface Quote {
@@ -16,6 +16,7 @@ interface QuotesContextProps {
   toggleLikeById: (id: string) => void;
   handleNext: () => void;
   likedQuotes: Quote[];
+  isLoading: boolean;
 }
 
 const QuotesContext = createContext<QuotesContextProps | undefined>(undefined);
@@ -23,96 +24,116 @@ const QuotesContext = createContext<QuotesContextProps | undefined>(undefined);
 export const QuotesProvider = ({ children }: { children: ReactNode }) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchAllQuotes().then((data) => {
       if (data && data.length > 0) {
         setQuotes(data);
+        setCurrentIndex(Math.floor(Math.random() * data.length));
       }
-    });
+    })
+    .finally(() => setIsLoading(false));
   }, []);
 
-  const handleLike = async () => {
+  const applyOptimisticToggle = useCallback(
+  (predicate: (q: Quote)=> boolean, revert = false) => {
+    setQuotes((prev) =>
+      prev.map((q) => {
+        if (!predicate(q)) 
+          return q;
+          const newIsLiked = revert ? !q.isLiked : !q.isLiked;
+          return {
+            ...q,
+            isLiked: newIsLiked,
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+          };
+        }));
+  }, []
+  );
+
+  const handleLike = useCallback( async () => {
     const quote = quotes[currentIndex];
-    if (!quote || !quote._id) return;
+    if (!quote?._id) return;
+
+    const id = quote._id;
+    const wasLiked = quote.isLiked;
 
     setQuotes((prev) =>
       prev.map((q, i) => {
-        if (i === currentIndex) {
-          const newIsLiked = !q.isLiked;
+        if (i !== currentIndex) return q; 
+          const newIsLiked = !wasLiked;
           return {
             ...q,
             isLiked: newIsLiked,
-            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
-          };
-        }
-        return q;
-      })
+            likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1};
+          })
     );
-    const result = await toggleQuoteLikeAction(quote._id);
+    const result = await toggleQuoteLikeAction(id);
 
     if (!result?.success) {
-      alert("Please log in to like quotes! ");
       setQuotes((prev) =>
         prev.map((q, i) => {
-          if (i === currentIndex) {
-            const revertedIsLiked = !q.isLiked;
+          if (i !== currentIndex)  return q; {
             return {
               ...q,
-              isLiked: revertedIsLiked,
-              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+              isLiked: wasLiked,
+              likeCount: wasLiked ? q.likeCount + 1 : q.likeCount - 1,
             };
           }
-          return q;
-        })
+          })
       );
     }
-  };
+  }, [quotes, currentIndex]);
 
-  const toggleLikeById = async (id: string) => {
+  const toggleLikeById = useCallback ( async (id: string) => {
+    const target = quotes.find((q)=> q._id === id);
+    if (!target) return;
+    const wasLiked = target.isLiked;
+
     setQuotes((prev) =>
       prev.map((q) => {
-        if (q._id === id) {
-          const newIsLiked = !q.isLiked;
+        if (q._id !== id) return q;
+          const newIsLiked = !wasLiked;
           return {
             ...q,
             isLiked: newIsLiked,
             likeCount: newIsLiked ? q.likeCount + 1 : q.likeCount - 1,
           };
-        }
-        return q;
-      })
-    );
+        })    
+      );
+    
     const result = await toggleQuoteLikeAction(id);
     if (!result?.success) {
       setQuotes((prev) =>
         prev.map((q) => {
-          if (q._id === id) {
-            const revertedIsLiked = !q.isLiked;
+          if (q._id === id) return q;
             return {
               ...q,
-              isLiked: revertedIsLiked,
-              likeCount: revertedIsLiked ? q.likeCount + 1 : q.likeCount - 1,
+              isLiked: wasLiked,
+              likeCount: wasLiked ? q.likeCount + 1 : q.likeCount - 1,
             };
-          }
-          return q;
         })
       );
     }
-  };
+  }, [quotes]);
 
 
-  const handleNext = () => {
-    if (quotes.length > 0) {
-      setCurrentIndex(Math.floor(Math.random() * quotes.length));
+  const handleNext = useCallback(() => {
+    if (quotes.length > 1) {
+      let next;
+      do{
+        next = Math.floor(Math.random() * quotes.length);
+      } while (next === currentIndex && quotes.length > 1);
+      setCurrentIndex(next);
     }
-  };
+  }, [quotes.length, currentIndex]);
 
-  const currentQuote = quotes[currentIndex] || null;
+  const currentQuote = quotes[currentIndex] ?? null;
   const likedQuotes = useMemo(() => quotes.filter((q) => q.isLiked), [quotes]);
 
   return (
-    <QuotesContext.Provider value={{ currentQuote, handleLike, toggleLikeById, handleNext, likedQuotes }}>
+    <QuotesContext.Provider value={{ currentQuote, handleLike, toggleLikeById, handleNext, likedQuotes, isLoading }}>
       {children}
     </QuotesContext.Provider>
   );

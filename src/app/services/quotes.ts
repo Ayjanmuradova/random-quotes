@@ -124,7 +124,7 @@ export async function toggleLike(id: string, userId: string){
     await col.updateOne(
       { _id: new ObjectId(id) },
       { $pull: { likedBy: userId } }
-    );
+    ); return false;
   } else {
     await col.updateOne(
       { _id: new ObjectId(id) },

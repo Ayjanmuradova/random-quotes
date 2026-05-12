@@ -1,5 +1,6 @@
 import { auth0 } from "@/lib/auth0";
 import Image from "next/image";
+import {redirect} from "next/navigation";
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ export default async function Profile() {
   const user = session?.user;
 
   if (!user) {
-    return null;
+    redirect("/auth/login");
   }
 
   const profileImage = user.picture || "https://s.gravatar.com/avatar/default?s=200";
