@@ -1,6 +1,4 @@
 
-import React from 'react';
-
 interface FormErrorProps {
   id: string;
   error?: string | string[];
