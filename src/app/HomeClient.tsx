@@ -2,13 +2,13 @@
 import QuoteCard from "@/components/QuoteCard";
 import Link from "next/link";
 
-export default function Home() {
+export default function HomeClient() {
   return (
-    <main className='min-h-[80vh] flex flex-col items-center justify-center gap-6'>
+    <div className='flex flex-col items-center gap-6 w-full max-w-lg mx-auto px-4'>
       <QuoteCard /> 
       <Link href="/user/quotes" className="text-emerald-500 hover:text-emerald-600 transition-colors underline text-sm font-medium">
-  Quotes on my profile
+  View my quotes →
 </Link>
-    </main>
+    </div>
   );
 }
